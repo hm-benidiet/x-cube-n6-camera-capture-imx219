@@ -25,6 +25,10 @@ Computer Vision application to capture video stream using USB UVC on STM32N6570-
 
 ## Update history
 
+### V2.0.1 / September 2026
+
+- Fix STM32_SigningTool_CLI API break since v2.21 by adding `--align` flag
+
 ### V2.0.0 / January 2026
 
 - Add support for multiple streams
