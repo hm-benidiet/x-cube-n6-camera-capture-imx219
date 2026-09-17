@@ -24,12 +24,12 @@
 
 /* Define sensor orientation */
 #if CAMERA_SELFY == 1
-#define SENSOR_IMX335_FLIP CMW_MIRRORFLIP_MIRROR
+#define SENSOR_IMX219_FLIP CMW_MIRRORFLIP_MIRROR
 #define SENSOR_VD66GY_FLIP CMW_MIRRORFLIP_FLIP
 #define SENSOR_VD55G1_FLIP CMW_MIRRORFLIP_FLIP
 #define SENSOR_VD1943_FLIP CMW_MIRRORFLIP_MIRROR
 #else
-#define SENSOR_IMX335_FLIP CMW_MIRRORFLIP_NONE
+#define SENSOR_IMX219_FLIP CMW_MIRRORFLIP_NONE
 #define SENSOR_VD66GY_FLIP CMW_MIRRORFLIP_FLIP_MIRROR
 #define SENSOR_VD55G1_FLIP CMW_MIRRORFLIP_FLIP_MIRROR
 #define SENSOR_VD1943_FLIP CMW_MIRRORFLIP_NONE
@@ -42,7 +42,7 @@
 static const char *sensor_names[] = {
   "CMW_UNKNOWN",
   "CMW_VD66GY",
-  "CMW_IMX335",
+  "CMW_IMX219",
   "CMW_VD55G1",
   "CMW_VD1943",
 };
@@ -60,8 +60,8 @@ static int CAM_getFlipMode(CMW_Sensor_Name_t sensor)
     sensor_mirror_flip = SENSOR_VD66GY_FLIP;
     sensor_name_idx = 1;
     break;
-  case CMW_IMX335_Sensor:
-    sensor_mirror_flip = SENSOR_IMX335_FLIP;
+  case CMW_IMX219_Sensor:
+    sensor_mirror_flip = SENSOR_IMX219_FLIP;
     sensor_name_idx = 2;
     break;
   case CMW_VD55G1_Sensor:

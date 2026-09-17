@@ -30,6 +30,7 @@ extern "C" {
 #define CAMERA_VD65G4_ADDRESS          0x20U
 #define CAMERA_VD65G4_FREQ_IN_HZ       12000000U
 #define CAMERA_IMX335_ADDRESS          0x34U
+#define CAMERA_IMX219_ADDRESS          0x20U  /* 7-bit address 0x10 */
 #define CAMERA_OV5640_ADDRESS          0x78U
 #define CAMERA_VD66GY_ADDRESS          0x20U
 #define CAMERA_VD66GY_FREQ_IN_HZ       12000000U

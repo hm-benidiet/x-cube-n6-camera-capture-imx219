@@ -100,6 +100,12 @@ static StaticSemaphore_t capture_sem_buffer;
 /* capture buffers */
 static uint8_t capture_buffer[CAPT_BUFFER_NB][MAX_IMG_FRAME_SIZE] ALIGN_32 IN_PSRAM;
 static struct buffer capture[CAPT_BUFFER_NB];
+#if defined(USE_IMX219_SENSOR) && IMX219_RAW_DUMP_TEST
+/* Temporary hardware bring-up diagnostic buffer, see cmw_camera.c and
+ * cmake/imx219_raw_dump.py. File-scope (not function-local) so its symbol
+ * name in the ELF is stable for the script to look up. */
+static uint8_t raw_dump_buffer[IMX219_DEBUG_RAW_DUMP_WIDTH * IMX219_DEBUG_RAW_DUMP_HEIGHT * 2] ALIGN_32;
+#endif
 #ifndef DISABLE_JPEG
 /* jpg */
 static uint8_t jpeg_buffer[JPEG_BUFFER_NB][MAX_IMG_FRAME_SIZE] ALIGN_32 IN_PSRAM;
@@ -554,6 +560,18 @@ static void capture_init(UVCL_StreamConf_t *current, int is_jpeg)
   assert(ret == 0);
 
   CAM_CapturePipe_Start(buffer->buffer, CMW_MODE_CONTINUOUS);
+
+#if defined(USE_IMX219_SENSOR) && IMX219_RAW_DUMP_TEST
+  /* Temporary hardware bring-up diagnostic: dump raw sensor data via the
+   * DCMIPP dump pipe (PIPE0) into raw_dump_buffer. Read it with
+   * cmake/imx219_raw_dump.py, or manually over SWD with
+   * `savemem <addr-of-raw_dump_buffer> <sizeof> out.bin`. Remove once ISP
+   * integration lands. See Doc/CMake-Build.md. */
+  {
+    int dbg_ret = CMW_CAMERA_DebugRawDump(raw_dump_buffer);
+    printf("CMW_CAMERA_DebugRawDump -> %d, buffer at %p\n", dbg_ret, (void *)raw_dump_buffer);
+  }
+#endif
 }
 
 static void capture_deinit(int is_jpeg)

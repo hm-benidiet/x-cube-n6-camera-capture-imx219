@@ -1,0 +1,48 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": { "major": 3, "minor": 21, "patch": 0 },
+  "configurePresets": [
+    {
+      "name": "default",
+      "displayName": "NUCLEO-N657X0-Q (FRONT)",
+      "description": "IMX335, front (selfie-like) camera orientation",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "ORIENTATION": "FRONT"
+      }
+    },
+    {
+      "name": "rear",
+      "displayName": "NUCLEO-N657X0-Q (REAR)",
+      "description": "IMX335, rear (camera-like) orientation",
+      "inherits": "default",
+      "binaryDir": "${sourceDir}/build-rear",
+      "cacheVariables": {
+        "ORIENTATION": "REAR"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "default",
+      "configurePreset": "default"
+    },
+    {
+      "name": "rear",
+      "configurePreset": "rear"
+    },
+    {
+      "name": "flash",
+      "displayName": "Flash (FRONT)",
+      "configurePreset": "default",
+      "targets": ["flash"]
+    },
+    {
+      "name": "flash-rear",
+      "displayName": "Flash (REAR)",
+      "configurePreset": "rear",
+      "targets": ["flash"]
+    }
+  ]
+}

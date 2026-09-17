@@ -16,6 +16,7 @@ Streamed video format can be dynamically selected among :
 
 - [Boot Overview](Doc/Boot-Overview.md)
 - [Configure available streams](Doc/Build-Options.md)
+- [CMake + pyOCD Build (NUCLEO-N657X0-Q)](Doc/CMake-Build.md)
 
 ---
 

@@ -64,7 +64,8 @@ typedef enum {
   CMW_VD55G1_Sensor,
   CMW_VD65G4_Sensor,
   CMW_VD1943_Sensor,
-  CMW_VD5943_Sensor
+  CMW_VD5943_Sensor,
+  CMW_IMX219_Sensor
 } CMW_Sensor_Name_t;
 
 typedef struct
@@ -111,6 +112,11 @@ typedef struct
 typedef struct
 {
   uint32_t pixel_format; /*!< This parameter can be a value from @ref CMW_PIXEL_FORMAT */
+} CMW_IMX219_config_t;
+
+typedef struct
+{
+  uint32_t pixel_format; /*!< This parameter can be a value from @ref CMW_PIXEL_FORMAT */
 } CMW_OV5640_config_t;
 
 
@@ -119,6 +125,7 @@ typedef struct
   CMW_Sensor_Name_t selected_sensor;
   union {
     CMW_IMX335_config_t imx335_config;
+    CMW_IMX219_config_t imx219_config;
     CMW_VD66GY_config_t vd66gy_config;
     CMW_VD56G3_config_t vd56g3_config;
     CMW_VD55G1_config_t vd55g1_config;
@@ -231,6 +238,14 @@ int32_t CMW_CAMERA_SetTestPattern(int32_t mode);
 int32_t CMW_CAMERA_GetTestPattern(int32_t *mode);
 
 int32_t CMW_CAMERA_GetSensorInfo(ISP_SensorInfoTypeDef *info);
+
+#if defined(USE_IMX219_SENSOR)
+#include "imx219.h"
+#if IMX219_RAW_DUMP_TEST
+/* Temporary hardware bring-up diagnostic, see cmw_camera.c. */
+int32_t CMW_CAMERA_DebugRawDump(uint8_t *pbuff);
+#endif
+#endif
 
 HAL_StatusTypeDef MX_DCMIPP_ClockConfig(DCMIPP_HandleTypeDef *hdcmipp);
 
