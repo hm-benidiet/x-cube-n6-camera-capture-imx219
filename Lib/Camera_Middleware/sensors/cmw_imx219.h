@@ -23,6 +23,8 @@ typedef struct
   uint16_t Address;
   uint32_t ClockInHz;
   IMX219_Object_t ctx_driver;
+  ISP_HandleTypeDef hIsp;
+  ISP_AppliHelpersTypeDef appliHelpers;
   DCMIPP_HandleTypeDef *hdcmipp;
   uint8_t IsInitialized;
   int32_t (*Init)(void);

@@ -4,10 +4,10 @@
   *
   * CMW sensor wrapper for the IMX219 hardware driver (imx219.c).
   *
-  * ISP/image-pipeline integration (debayering, AWB, AE) is intentionally NOT
-  * wired up here -- Start()/Run() only bring the sensor itself up and start
-  * its MIPI CSI-2 stream. DCMIPP pipes will receive raw, unprocessed Bayer10
-  * data until the ISP is integrated in a follow-up step.
+  * ISP tuning (Inc/imx219_isp_param_conf.h) is adapted from IMX335's, not
+  * calibrated against a real IMX219 module -- expect a color cast until it's
+  * redone with real STM32 ISP IQTune calibration. See that file's header
+  * comment for exactly which fields are placeholders.
   ******************************************************************************
   */
 
@@ -20,6 +20,9 @@
 #include "cmw_camera.h"
 #include "imx219_reg.h"
 #include "imx219.h"
+#ifndef ISP_MW_TUNING_TOOL_SUPPORT
+#include "imx219_isp_param_conf.h"
+#endif
 
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 
@@ -171,12 +174,36 @@ void CMW_IMX219_SetDefaultSensorValues(CMW_IMX219_config_t *imx219_config)
 
 static int32_t CMW_IMX219_Start(void *io_ctx)
 {
+#ifndef ISP_MW_TUNING_TOOL_SUPPORT
+  int ret;
+  /* Statistic area is provided with null value so that it force the ISP Library to get the statistic
+   * area information from the tuning file.
+   */
+  ret = ISP_Init(&((CMW_IMX219_t *)io_ctx)->hIsp, ((CMW_IMX219_t *)io_ctx)->hdcmipp, 0, &((CMW_IMX219_t *)io_ctx)->appliHelpers, &ISP_IQParamCacheInit_IMX219);
+  if (ret != ISP_OK)
+  {
+    return CMW_ERROR_COMPONENT_FAILURE;
+  }
+
+  ret = ISP_Start(&((CMW_IMX219_t *)io_ctx)->hIsp);
+  if (ret != ISP_OK)
+  {
+      return CMW_ERROR_PERIPH_FAILURE;
+  }
+#endif
   return IMX219_Start(&((CMW_IMX219_t *)io_ctx)->ctx_driver);
 }
 
 static int32_t CMW_IMX219_Run(void *io_ctx)
 {
-  /* No ISP background processing yet: raw sensor stream only. */
+#ifndef ISP_MW_TUNING_TOOL_SUPPORT
+  int ret;
+  ret = ISP_BackgroundProcess(&((CMW_IMX219_t *)io_ctx)->hIsp);
+  if (ret != ISP_OK)
+  {
+      return CMW_ERROR_PERIPH_FAILURE;
+  }
+#endif
   return CMW_ERROR_NONE;
 }
 
@@ -199,7 +226,22 @@ static void CMW_IMX219_PowerOn(CMW_IMX219_t *io_ctx)
 
 static void CMW_IMX219_VsyncEventCallback(void *io_ctx, uint32_t pipe)
 {
-  /* No ISP statistics gathering yet. */
+#ifndef ISP_MW_TUNING_TOOL_SUPPORT
+  /* Update the ISP frame counter and call its statistics handler */
+  switch (pipe)
+  {
+    case DCMIPP_PIPE0 :
+      ISP_IncDumpFrameId(&((CMW_IMX219_t *)io_ctx)->hIsp);
+      break;
+    case DCMIPP_PIPE1 :
+      ISP_IncMainFrameId(&((CMW_IMX219_t *)io_ctx)->hIsp);
+      ISP_GatherStatistics(&((CMW_IMX219_t *)io_ctx)->hIsp);
+      break;
+    case DCMIPP_PIPE2 :
+      ISP_IncAncillaryFrameId(&((CMW_IMX219_t *)io_ctx)->hIsp);
+      break;
+  }
+#endif
 }
 
 static void CMW_IMX219_FrameEventCallback(void *io_ctx, uint32_t pipe)

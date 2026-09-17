@@ -1121,7 +1121,8 @@ static void CMW_CAMERA_EnablePin(int value)
   HAL_GPIO_WritePin(EN_CAM_PORT, EN_CAM_PIN, value ? GPIO_PIN_SET : GPIO_PIN_RESET);
 }
 
-#if defined(USE_VD66GY_SENSOR) || defined(USE_IMX335_SENSOR) || defined(USE_VD5943_SENSOR) || defined(USE_VD1943_SENSOR)
+#if defined(USE_VD66GY_SENSOR) || defined(USE_IMX335_SENSOR) || defined(USE_VD5943_SENSOR) || defined(USE_VD1943_SENSOR) \
+    || defined(USE_IMX219_SENSOR)
 static ISP_StatusTypeDef CB_ISP_SetSensorGain(uint32_t camera_instance, int32_t gain)
 {
   if (CMW_CAMERA_SetGain(gain) != CMW_ERROR_NONE)
@@ -2057,6 +2058,11 @@ static int32_t CMW_CAMERA_IMX219_Init(CMW_Sensor_Init_t *initSensors_params)
   camera_bsp.imx219_bsp.ShutdownPin = CMW_CAMERA_ShutdownPin;
   camera_bsp.imx219_bsp.EnablePin   = CMW_CAMERA_EnablePin;
   camera_bsp.imx219_bsp.hdcmipp     = &hcamera_dcmipp;
+  camera_bsp.imx219_bsp.appliHelpers.SetSensorGain = CB_ISP_SetSensorGain;
+  camera_bsp.imx219_bsp.appliHelpers.GetSensorGain = CB_ISP_GetSensorGain;
+  camera_bsp.imx219_bsp.appliHelpers.SetSensorExposure = CB_ISP_SetSensorExposure;
+  camera_bsp.imx219_bsp.appliHelpers.GetSensorExposure = CB_ISP_GetSensorExposure;
+  camera_bsp.imx219_bsp.appliHelpers.GetSensorInfo = CB_ISP_GetSensorInfo;
 
   ret = CMW_IMX219_Probe(&camera_bsp.imx219_bsp, &Camera_Drv);
   if (ret != CMW_ERROR_NONE)

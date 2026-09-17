@@ -68,10 +68,18 @@ int32_t IMX219_SetTestPattern(IMX219_Object_t *pObj, int32_t mode);
 /* Temporary hardware bring-up diagnostic: reduce the crop/output window to
  * 128x128 so a raw-Bayer frame fits in a small SWD-dumpable buffer, bypassing
  * the DCMIPP pixel-packer/ISP entirely. Not part of the normal capture path;
- * set to 0 to compile it out, or remove once ISP integration lands.
- * See Doc/CMake-Build.md and cmake/imx219_raw_dump.py. */
+ * set to 1 to compile it back in, or remove once ISP integration is done.
+ * See Doc/CMake-Build.md and cmake/imx219_raw_dump.py.
+ *
+ * Defaults to OFF now that ISP integration is in: this diagnostic shrinks
+ * the sensor's crop and suspends PIPE1 (the normal UVC pipe) to let PIPE0
+ * capture without the two conflicting (they share one sensor readout), and
+ * never restores either afterwards -- so leaving it on permanently breaks
+ * the real video stream for the rest of that boot. Turn it back on only
+ * when you specifically want to re-check the raw sensor output, not
+ * alongside real streaming. */
 #ifndef IMX219_RAW_DUMP_TEST
-#define IMX219_RAW_DUMP_TEST 1
+#define IMX219_RAW_DUMP_TEST 0
 #endif
 #define IMX219_DEBUG_RAW_DUMP_WIDTH  128
 #define IMX219_DEBUG_RAW_DUMP_HEIGHT 128

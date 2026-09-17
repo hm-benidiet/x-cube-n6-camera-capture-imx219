@@ -6,27 +6,36 @@ STM32CubeIDE projects. It only targets the **NUCLEO-N657X0-Q** board with an
 Makefile build instead (see the root [Makefile](../Makefile)).
 
 Note: the IMX219 driver ([Lib/Camera_Middleware/sensors/imx219/](../Lib/Camera_Middleware/sensors/imx219/))
-only brings up the sensor itself (mode config, streaming, gain/exposure/test
-pattern) — ISP integration (debayering, AWB, AE) is not wired up yet, so
-DCMIPP pipes currently receive raw, unprocessed Bayer10 data.
+and ISP integration (debayering, AE, AWB) are both wired up and confirmed
+working on real hardware — the UVC stream produces a real, detailed image.
+**Colors currently have a strong magenta/pink cast**: the AWB tuning
+([Inc/imx219_isp_param_conf.h](../Inc/imx219_isp_param_conf.h)) is adapted
+from IMX335's, not calibrated against a real IMX219 module (that needs the
+STM32 ISP IQTune tool and a color chart, which wasn't available here). See
+that file's header comment for exactly which fields are real vs. copied
+placeholders.
 
 ## Checking the sensor is actually capturing (raw dump diagnostic)
 
-Since there's no ISP yet, the normal UVC video stream is unusable for
-telling whether the IMX219 is really working (see the DCMIPP/ISP explanation
-further down). A separate, temporary diagnostic bypasses the ISP/pixel-packer
-pipeline entirely: it shrinks the sensor's crop to 128x128 and captures raw
-Bayer10 straight into a small buffer via DCMIPP's "dump pipe" (PIPE0),
-readable directly over SWD.
+A separate, temporary diagnostic bypasses the ISP/pixel-packer pipeline
+entirely: it shrinks the sensor's crop to 128x128 and captures raw Bayer10
+straight into a small buffer via DCMIPP's "dump pipe" (PIPE0), readable
+directly over SWD. This was the main bring-up tool before ISP integration
+was in place.
 
-It's enabled by default (`IMX219_RAW_DUMP_TEST` in
-[imx219.h](../Lib/Camera_Middleware/sensors/imx219/imx219.h); set to 0 to
-compile it out). To use it:
+**It's off by default now** (`IMX219_RAW_DUMP_TEST` in
+[imx219.h](../Lib/Camera_Middleware/sensors/imx219/imx219.h), set to 0) —
+turning it on breaks the real video stream for the rest of that boot. It
+suspends PIPE1 (the normal UVC pipe) to let PIPE0 use the sensor without the
+two conflicting (they share one sensor readout, see the comment above
+`CMW_CAMERA_DebugRawDump()` in cmw_camera.c), and never restores either
+afterwards. Only turn it back on when you specifically want to re-check raw
+sensor output, not alongside real streaming. To use it:
 
-1. Build and flash as usual, then start a UVC stream at least once (e.g.
-   `ffplay /dev/videoN` or any viewer) — this is what actually triggers
-   `CMW_CAMERA_DebugRawDump()` and starts PIPE0. The stream itself will show
-   nothing useful (no ISP), that's expected.
+1. Set `IMX219_RAW_DUMP_TEST` to 1, rebuild and flash, then start a UVC
+   stream at least once (e.g. `ffplay /dev/videoN` or any viewer) — this is
+   what actually triggers `CMW_CAMERA_DebugRawDump()` and starts PIPE0. The
+   stream itself will show nothing useful once this fires, that's expected.
 2. While it's running, fetch and view the raw frame:
    ```sh
    pip install pyocd pillow numpy matplotlib   # matplotlib optional

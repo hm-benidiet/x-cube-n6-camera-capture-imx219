@@ -2,3 +2,4 @@
 /build-*/
 /raw_dump.png
 .venv
+__pycache__

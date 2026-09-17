@@ -16,6 +16,7 @@
  ******************************************************************************
  */
 #include <assert.h>
+#include <stdio.h>
 #include "cmw_camera.h"
 #include "app_cam.h"
 #include "app_config.h"
@@ -121,6 +122,7 @@ static void CAM_InitCropConfig(CMW_Manual_roi_area_t *roi, int sensor_width, int
 
 static void CAM_EnableYuv(uint32_t Pipe)
 {
+  /*
   DCMIPP_ColorConversionConfTypeDef color_conf = {
     .ClampOutputSamples = ENABLE,
     .OutputSamplesType = DCMIPP_CLAMP_YUV,
@@ -128,8 +130,17 @@ static void CAM_EnableYuv(uint32_t Pipe)
     .GR =  55, .GG =  183, .GB =  18, .GA =   0,
     .BR = -30, .BG = -101, .BB = 131, .BA = 128,
   };
-  int ret;
+  */
 
+  DCMIPP_ColorConversionConfTypeDef color_conf = {
+    .ClampOutputSamples = ENABLE,
+    .OutputSamplesType = DCMIPP_CLAMP_YUV,
+    .RR = 62, .RG = -14, .RB = -49, .RA = 128,
+    .GR = -37, .GG = -59, .GB = 275, .GA = 0,
+    .BR = 41, .BG = 109, .BB = -91, .BA = 128,
+  };
+  int ret;
+  
   /* only pipe1 can do yuv */
   assert(Pipe == DCMIPP_PIPE1);
   ret = HAL_DCMIPP_PIPE_SetYUVConversionConfig(CMW_CAMERA_GetDCMIPPHandle(), Pipe, &color_conf);
