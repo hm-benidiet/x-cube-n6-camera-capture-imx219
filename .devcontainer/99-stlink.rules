@@ -1,0 +1,22 @@
+# Host udev rules for the ST-Link on the NUCLEO-N657X0-Q (install on the HOST,
+# not in the container):
+#
+#   sudo cp .devcontainer/99-stlink.rules /etc/udev/rules.d/
+#   sudo udevadm control --reload-rules && sudo udevadm trigger
+#
+# Makes the probe and its virtual COM port accessible to non-root users, which
+# the devcontainer's "vscode" user needs for pyOCD and the serial monitor.
+
+# ST-Link V2 / V2-1 / V3 (all variants)
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3748", MODE="0666"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374b", MODE="0666"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374d", MODE="0666"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374e", MODE="0666"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374f", MODE="0666"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3752", MODE="0666"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3753", MODE="0666"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3754", MODE="0666"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3757", MODE="0666"
+
+# ST-Link virtual COM port
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0483", MODE="0666"

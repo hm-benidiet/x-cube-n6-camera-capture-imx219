@@ -3,6 +3,30 @@
 Note: This is a fork which is adapted to work with a IMX219 instead of IMX355. 
 
 
+## Devcontainer (recommended)
+
+The repo ships a VS Code devcontainer ([.devcontainer/](.devcontainer/)) with the Arm GNU
+toolchain, CMake/Ninja, pyOCD, gdb and a serial terminal. It needs a Linux host so the
+ST-Link can be passed through over USB.
+
+1. One-time, on the **host**: install the udev rules so the container user can access the ST-Link:
+   ```bash
+   sudo cp .devcontainer/99-stlink.rules /etc/udev/rules.d/
+   sudo udevadm control --reload-rules && sudo udevadm trigger
+   ```
+2. In VS Code: *Dev Containers: Reopen in Container*.
+3. Use *Terminal → Run Task…*:
+   - `Build (FRONT)` / `Build (REAR)`
+   - `Flash (FRONT)` / `Flash (REAR)`: build and load into SRAM
+   - `Run (FRONT)` / `Run (REAR)`: flash, then open the serial console (115200 8N1)
+   - `Serial monitor`: console only (`serial-monitor` in a terminal)
+4. Debugging: the `Debug (FRONT|REAR)` launch configurations (Cortex-Debug + pyOCD) load the
+   image into SRAM and stop at `main`. `Attach` connects to firmware that is already running.
+
+From a terminal: `cmake --workflow --preset build-and-flash` builds and flashes in one step.
+
+## Manual build
+
 To try the software, change the jumpers to devmode, and run the following commands:
 
 ```bash

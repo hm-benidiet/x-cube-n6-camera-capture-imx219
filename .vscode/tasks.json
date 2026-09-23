@@ -1,0 +1,76 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Configure",
+      "type": "shell",
+      "command": "cmake --preset ${input:preset}",
+      "problemMatcher": []
+    },
+    {
+      "label": "Build (FRONT)",
+      "type": "shell",
+      "command": "cmake --preset default && cmake --build --preset default",
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": ["$gcc"]
+    },
+    {
+      "label": "Build (REAR)",
+      "type": "shell",
+      "command": "cmake --preset rear && cmake --build --preset rear",
+      "group": "build",
+      "problemMatcher": ["$gcc"]
+    },
+    {
+      "label": "Flash (FRONT)",
+      "detail": "Build and load into SRAM over ST-Link (board in Dev mode)",
+      "type": "shell",
+      "command": "cmake --workflow --preset build-and-flash",
+      "problemMatcher": ["$gcc"]
+    },
+    {
+      "label": "Flash (REAR)",
+      "detail": "Build and load into SRAM over ST-Link (board in Dev mode)",
+      "type": "shell",
+      "command": "cmake --workflow --preset build-and-flash-rear",
+      "problemMatcher": ["$gcc"]
+    },
+    {
+      "label": "Serial monitor",
+      "detail": "ST-Link virtual COM port, 115200 8N1 (exit with Ctrl-A Ctrl-X)",
+      "type": "shell",
+      "command": "serial-monitor",
+      "presentation": { "panel": "dedicated", "focus": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run (FRONT)",
+      "detail": "Build, flash and open the serial console",
+      "dependsOrder": "sequence",
+      "dependsOn": ["Flash (FRONT)", "Serial monitor"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Run (REAR)",
+      "detail": "Build, flash and open the serial console",
+      "dependsOrder": "sequence",
+      "dependsOn": ["Flash (REAR)", "Serial monitor"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Clean",
+      "type": "shell",
+      "command": "rm -rf build build-rear",
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "preset",
+      "type": "pickString",
+      "description": "Configure preset",
+      "options": ["default", "rear"],
+      "default": "default"
+    }
+  ]
+}

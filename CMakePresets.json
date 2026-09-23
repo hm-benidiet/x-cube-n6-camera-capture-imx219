@@ -1,12 +1,21 @@
 {
-  "version": 3,
-  "cmakeMinimumRequired": { "major": 3, "minor": 21, "patch": 0 },
+  "version": 6,
+  "cmakeMinimumRequired": { "major": 3, "minor": 25, "patch": 0 },
   "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "toolchainFile": "${sourceDir}/cmake/arm-none-eabi-gcc.cmake",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
     {
       "name": "default",
       "displayName": "NUCLEO-N657X0-Q (FRONT)",
-      "description": "IMX335, front (selfie-like) camera orientation",
-      "generator": "Ninja",
+      "description": "IMX219, front (selfie-like) camera orientation",
+      "inherits": "base",
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
         "ORIENTATION": "FRONT"
@@ -15,8 +24,8 @@
     {
       "name": "rear",
       "displayName": "NUCLEO-N657X0-Q (REAR)",
-      "description": "IMX335, rear (camera-like) orientation",
-      "inherits": "default",
+      "description": "IMX219, rear (camera-like) orientation",
+      "inherits": "base",
       "binaryDir": "${sourceDir}/build-rear",
       "cacheVariables": {
         "ORIENTATION": "REAR"
@@ -26,23 +35,43 @@
   "buildPresets": [
     {
       "name": "default",
+      "displayName": "Build (FRONT)",
       "configurePreset": "default"
     },
     {
       "name": "rear",
+      "displayName": "Build (REAR)",
       "configurePreset": "rear"
     },
     {
       "name": "flash",
-      "displayName": "Flash (FRONT)",
+      "displayName": "Build + load into SRAM (FRONT)",
       "configurePreset": "default",
       "targets": ["flash"]
     },
     {
       "name": "flash-rear",
-      "displayName": "Flash (REAR)",
+      "displayName": "Build + load into SRAM (REAR)",
       "configurePreset": "rear",
       "targets": ["flash"]
+    }
+  ],
+  "workflowPresets": [
+    {
+      "name": "build-and-flash",
+      "displayName": "Configure, build and load into SRAM (FRONT)",
+      "steps": [
+        { "type": "configure", "name": "default" },
+        { "type": "build", "name": "flash" }
+      ]
+    },
+    {
+      "name": "build-and-flash-rear",
+      "displayName": "Configure, build and load into SRAM (REAR)",
+      "steps": [
+        { "type": "configure", "name": "rear" },
+        { "type": "build", "name": "flash-rear" }
+      ]
     }
   ]
 }

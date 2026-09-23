@@ -1,0 +1,41 @@
+{
+  "name": "NUCLEO-N657X0-Q firmware",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+
+  // Mount the repo at the same path as on the host, so build directories and
+  // compile_commands.json work both inside and outside the container.
+  "workspaceMount": "source=${localWorkspaceFolder},target=${localWorkspaceFolder},type=bind",
+  "workspaceFolder": "${localWorkspaceFolder}",
+
+  // USB access to the on-board ST-Link (pyOCD) and its virtual COM port.
+  // Linux hosts only; /dev/bus/usb is bind-mounted so re-plugging the board
+  // does not require restarting the container.
+  "runArgs": ["--privileged"],
+  "mounts": [
+    "source=/dev/bus/usb,target=/dev/bus/usb,type=bind"
+  ],
+
+  "remoteUser": "vscode",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cmake-tools",
+        "ms-vscode.cpptools",
+        "marus25.cortex-debug",
+        "ms-python.python"
+      ],
+      "settings": {
+        "cmake.useCMakePresets": "always",
+        "cmake.configureOnOpen": true,
+        "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+        "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json",
+        "cortex-debug.gdbPath": "gdb-multiarch",
+        "cortex-debug.armToolchainPath": "/opt/gcc-arm-none-eabi/bin",
+        "python.defaultInterpreterPath": "/opt/venv/bin/python"
+      }
+    }
+  }
+}

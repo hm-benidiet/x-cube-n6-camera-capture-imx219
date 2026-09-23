@@ -1,0 +1,97 @@
+{
+  // Debugging via cortex-debug + pyOCD. The STM32N657 has no internal flash:
+  // the image is loaded into AXI SRAM exactly like cmake/pyocd_load.py does it
+  // (no chip reset, RISAF2/SAU/fault handlers disabled, SP/PC taken from the
+  // image's vector table at 0x34180400). Board must be in Dev mode.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug (FRONT)",
+      "type": "cortex-debug",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "executable": "${workspaceFolder}/build/Project",
+      "preLaunchTask": "Build (FRONT)",
+      "servertype": "pyocd",
+      "serverpath": "${workspaceFolder}/.devcontainer/pyocd-cortex-debug.sh",
+      "targetId": "cortex_m",
+      "gdbPath": "gdb-multiarch",
+      "toolchainPrefix": "arm-none-eabi",
+      "overrideLaunchCommands": [
+        "set mem inaccessible-by-default off",
+        "monitor halt",
+        "set *(unsigned int *)0x54028040 = 0",
+        "set *(unsigned int *)0x54028080 = 0",
+        "set *(unsigned int *)0x540280C0 = 0",
+        "set *(unsigned int *)0x54028100 = 0",
+        "set *(unsigned int *)0x54028140 = 0",
+        "set *(unsigned int *)0x54028180 = 0",
+        "set *(unsigned int *)0x540281C0 = 0",
+        "set *(unsigned int *)0xE000EDD0 = 0",
+        "set *(unsigned int *)0xE000ED24 = 0",
+        "load",
+        "set $msp = *(unsigned int *)0x34180400",
+        "set $pc = *(unsigned int *)0x34180404"
+      ],
+      "overrideRestartCommands": [
+        "monitor halt",
+        "load",
+        "set $msp = *(unsigned int *)0x34180400",
+        "set $pc = *(unsigned int *)0x34180404"
+      ],
+      "runToEntryPoint": "main"
+    },
+    {
+      "name": "Debug (REAR)",
+      "type": "cortex-debug",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "executable": "${workspaceFolder}/build-rear/Project",
+      "preLaunchTask": "Build (REAR)",
+      "servertype": "pyocd",
+      "serverpath": "${workspaceFolder}/.devcontainer/pyocd-cortex-debug.sh",
+      "targetId": "cortex_m",
+      "gdbPath": "gdb-multiarch",
+      "toolchainPrefix": "arm-none-eabi",
+      "overrideLaunchCommands": [
+        "set mem inaccessible-by-default off",
+        "monitor halt",
+        "set *(unsigned int *)0x54028040 = 0",
+        "set *(unsigned int *)0x54028080 = 0",
+        "set *(unsigned int *)0x540280C0 = 0",
+        "set *(unsigned int *)0x54028100 = 0",
+        "set *(unsigned int *)0x54028140 = 0",
+        "set *(unsigned int *)0x54028180 = 0",
+        "set *(unsigned int *)0x540281C0 = 0",
+        "set *(unsigned int *)0xE000EDD0 = 0",
+        "set *(unsigned int *)0xE000ED24 = 0",
+        "load",
+        "set $msp = *(unsigned int *)0x34180400",
+        "set $pc = *(unsigned int *)0x34180404"
+      ],
+      "overrideRestartCommands": [
+        "monitor halt",
+        "load",
+        "set $msp = *(unsigned int *)0x34180400",
+        "set $pc = *(unsigned int *)0x34180404"
+      ],
+      "runToEntryPoint": "main"
+    },
+    {
+      "name": "Attach (FRONT, already flashed)",
+      "type": "cortex-debug",
+      "request": "attach",
+      "cwd": "${workspaceFolder}",
+      "executable": "${workspaceFolder}/build/Project",
+      "servertype": "pyocd",
+      "serverpath": "${workspaceFolder}/.devcontainer/pyocd-cortex-debug.sh",
+      "targetId": "cortex_m",
+      "gdbPath": "gdb-multiarch",
+      "toolchainPrefix": "arm-none-eabi",
+      "overrideAttachCommands": [
+        "set mem inaccessible-by-default off",
+        "monitor halt"
+      ]
+    }
+  ]
+}
