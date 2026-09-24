@@ -110,8 +110,11 @@ load sequence found in the IAR debug macro
 ([`EWARM/NUCLEO-N657X0-Q/fix_load_debug.mac`](../EWARM/NUCLEO-N657X0-Q/fix_load_debug.mac)) —
 the only documented reference for what this part actually needs:
 
-1. Attach over SWD and halt the core **without** a chip reset (a reset would
-   drop the SRAM contents and re-lock the peripherals in step 2).
+1. Attach over SWD, reset the chip and halt the core. The reset is required:
+   otherwise the state of the previously running application (active
+   exception, PSP/CONTROL, enabled interrupts, running DCMIPP/USB DMA) leaks
+   into the new image and crashes it as soon as the memory layout changed.
+   The reset re-locks the peripherals, which is why step 2 comes after it.
 2. Disable the RISAF2 firewall, the TrustZone SAU, and the fault-handler
    enables, so the debug probe has unrestricted memory access.
 3. Write `Project.bin` into SRAM at `0x34180400` (`ORIGIN(AXISRAM2_P2_S)`).

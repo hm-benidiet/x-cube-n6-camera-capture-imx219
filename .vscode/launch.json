@@ -1,7 +1,7 @@
 {
   // Debugging via cortex-debug + pyOCD. The STM32N657 has no internal flash:
   // the image is loaded into AXI SRAM exactly like cmake/pyocd_load.py does it
-  // (no chip reset, RISAF2/SAU/fault handlers disabled, SP/PC taken from the
+  // (chip reset + halt, RISAF2/SAU/fault handlers disabled, SP/PC taken from the
   // image's vector table at 0x34180400). Board must be in Dev mode.
   "version": "0.2.0",
   "configurations": [
@@ -19,7 +19,7 @@
       "toolchainPrefix": "arm-none-eabi",
       "overrideLaunchCommands": [
         "set mem inaccessible-by-default off",
-        "monitor halt",
+        "monitor reset halt",
         "set *(unsigned int *)0x54028040 = 0",
         "set *(unsigned int *)0x54028080 = 0",
         "set *(unsigned int *)0x540280C0 = 0",
@@ -34,7 +34,7 @@
         "set $pc = *(unsigned int *)0x34180404"
       ],
       "overrideRestartCommands": [
-        "monitor halt",
+        "monitor reset halt",
         "load",
         "set $msp = *(unsigned int *)0x34180400",
         "set $pc = *(unsigned int *)0x34180404"
@@ -55,7 +55,7 @@
       "toolchainPrefix": "arm-none-eabi",
       "overrideLaunchCommands": [
         "set mem inaccessible-by-default off",
-        "monitor halt",
+        "monitor reset halt",
         "set *(unsigned int *)0x54028040 = 0",
         "set *(unsigned int *)0x54028080 = 0",
         "set *(unsigned int *)0x540280C0 = 0",
@@ -70,7 +70,7 @@
         "set $pc = *(unsigned int *)0x34180404"
       ],
       "overrideRestartCommands": [
-        "monitor halt",
+        "monitor reset halt",
         "load",
         "set $msp = *(unsigned int *)0x34180400",
         "set $pc = *(unsigned int *)0x34180404"

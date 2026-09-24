@@ -32,6 +32,7 @@ set(APP_SOURCES
   Src/app_fuseprogramming.c
   Src/stm32n6xx_it.c
   Src/app_cam.c
+  Src/app_mnist.c
   Src/freertos_bsp.c
 )
 

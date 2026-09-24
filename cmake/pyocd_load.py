@@ -10,8 +10,11 @@ The load sequence below mirrors EWARM/NUCLEO-N657X0-Q/fix_load_debug.mac,
 which is the only documented reference for what actually has to happen on
 this part:
 
-  1. Attach and halt the core WITHOUT a chip reset. A normal reset would
-     drop the SRAM contents and re-lock the peripherals disabled below.
+  1. Reset the chip and halt the core. Without the reset, state of the
+     previously running application leaks into the new one (active
+     exception, PSP/CONTROL, enabled interrupts, running DCMIPP/USB DMA),
+     which crashes as soon as the memory layout changed between builds.
+     The reset re-locks RISAF2, which is why it happens before step 2.
   2. Disable RISAF2 (resource isolation firewall) so the debug probe (and
      later the application) has unrestricted access to the memory it needs.
   3. Disable the SAU (TrustZone Security Attribution Unit) and the
@@ -69,6 +72,9 @@ def main() -> int:
     with session:
         target = session.target
         core = target.selected_core
+
+        print("Resetting and halting the core...")
+        target.reset_and_halt()
 
         print("Disabling RISAF2, SAU and fault handlers (see fix_load_debug.mac)...")
         for reg in RISAF2_DISABLE_REGS:

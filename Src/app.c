@@ -25,6 +25,7 @@
 #include "app_cam.h"
 #include "app_config.h"
 #include "app_jpg.h"
+#include "app_mnist.h"
 #include "cmw_camera.h"
 #include "stm32n6xx_hal.h"
 #include "ulist.h"
@@ -626,6 +627,8 @@ static void uvc_thread_fct(void *arg)
       if (!buffer)
         break;
 
+      MNIST_ProcessFrame(buffer->buffer, current.stream.width, current.stream.height);
+
       if (is_jpeg)
         send_jpg_frame(buffer);
       else
@@ -701,6 +704,8 @@ void app_run()
 
   LIST_Init();
   sr_init(&streaming_req);
+
+  MNIST_Init();
 
   /* UVC ss */
   UVC_Init();

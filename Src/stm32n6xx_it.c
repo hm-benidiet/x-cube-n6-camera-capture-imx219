@@ -22,6 +22,12 @@
 
 #include "cmw_camera.h"
 #include "uvcl.h"
+#include "app_mnist.h"
+#ifdef STM32N6570_DK_REV
+#include "stm32n6570_discovery.h"
+#else
+#include "stm32n6xx_nucleo.h"
+#endif
 
 /**
   * @brief   This function handles NMI exception.
@@ -105,3 +111,7 @@ void USB1_OTG_HS_IRQHandler(void)
   UVCL_IRQHandler();
 }
 
+void EXTI13_IRQHandler(void)
+{
+  BSP_PB_IRQHandler(MNIST_BUTTON);
+}
